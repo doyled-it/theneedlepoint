@@ -2,11 +2,11 @@ import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import { ReviewData } from "../data";
 
-interface D3PlotComponentProps {
+interface ScoreYearComponentProps {
   data: ReviewData[];
 }
 
-const D3PlotComponent: React.FC<D3PlotComponentProps> = ({ data }) => {
+const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
 
@@ -130,4 +130,4 @@ const D3PlotComponent: React.FC<D3PlotComponentProps> = ({ data }) => {
   );
 };
 
-export default D3PlotComponent;
+export default ScoreYearComponent;

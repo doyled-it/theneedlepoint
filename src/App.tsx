@@ -8,7 +8,8 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import D3PlotComponent from "./components/D3PlotComponent";
+import YearBoxPlotComponent from "./components/YearBoxPlotComponent"; // Assuming you have a YearBoxPlotComponent
+import ScoreYearComponent from "./components/ScoreYearComponent"; // Assuming you have a ScoreYearComponent
 import { ReviewData, processJsonl } from "./data";
 
 const App: React.FC = () => {
@@ -17,12 +18,16 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(
-        "https://raw.githubusercontent.com/doyled-it/theneedlescrape/main/data/review_info_w_cover_art.jsonl"
-      );
-      const rawData = await response.text();
-      const processedData = processJsonl(rawData);
-      setData(processedData);
+      try {
+        const response = await fetch(
+          "https://raw.githubusercontent.com/doyled-it/theneedlescrape/main/data/review_info_w_cover_art.jsonl"
+        );
+        const rawData = await response.text();
+        const processedData = processJsonl(rawData);
+        setData(processedData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
     fetchData();
   }, []);
@@ -34,16 +39,17 @@ const App: React.FC = () => {
   const renderPlot = () => {
     switch (selectedPlot) {
       case "Score vs Date":
-        return <D3PlotComponent data={data} />;
-      // Add other plots as cases here
+        return <ScoreYearComponent data={data} />;
+      case "Score vs Year":
+        return <YearBoxPlotComponent data={data} />;
       default:
-        return <D3PlotComponent data={data} />;
+        return <ScoreYearComponent data={data} />;
     }
   };
 
   return (
     <div className="App">
-      <AppBar position="static" style={{ backgroundColor: "#333" }}>
+      <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             The Needle Drop Reviews
