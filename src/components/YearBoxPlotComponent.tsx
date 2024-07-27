@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { ReviewData } from "../data";
 
@@ -11,6 +11,8 @@ const YearBoxPlotComponent: React.FC<YearBoxPlotComponentProps> = ({
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const [showMeanLine, setShowMeanLine] = useState(true);
+  const [showTrendLine, setShowTrendLine] = useState(true);
 
   useEffect(() => {
     const margin = { top: 60, right: 30, bottom: 40, left: 40 };
@@ -139,14 +141,16 @@ const YearBoxPlotComponent: React.FC<YearBoxPlotComponentProps> = ({
         .attr("stroke", "black");
 
       // Add mean line
-      svg
-        .append("line")
-        .attr("x1", (x(String(year)) ?? 0) - boxWidth / 2)
-        .attr("x2", (x(String(year)) ?? 0) + boxWidth / 2)
-        .attr("y1", y(mean))
-        .attr("y2", y(mean))
-        .attr("stroke", "red")
-        .style("stroke-dasharray", "4,2");
+      if (showMeanLine) {
+        svg
+          .append("line")
+          .attr("x1", (x(String(year)) ?? 0) - boxWidth / 2)
+          .attr("x2", (x(String(year)) ?? 0) + boxWidth / 2)
+          .attr("y1", y(mean))
+          .attr("y2", y(mean))
+          .attr("stroke", "red")
+          .style("stroke-dasharray", "4,2");
+      }
 
       svg
         .selectAll(".outlier")
@@ -165,18 +169,59 @@ const YearBoxPlotComponent: React.FC<YearBoxPlotComponentProps> = ({
         .on("mouseout", handleMouseOut)
         .on("click", (event: MouseEvent, d: ReviewData) => handleDotClick(d));
     });
-  }, [data]);
+
+    // Add trend line
+    if (showTrendLine) {
+      const yearGrouped = d3.group(filteredData, (d: ReviewData) => d.year);
+      const trendData = Array.from(yearGrouped, ([key, value]) => ({
+        year: key,
+        mean: d3.mean(value, (d: ReviewData) => d.score) as number,
+      })).sort((a, b) => a.year - b.year);
+
+      const trendLine = d3
+        .line()
+        .x((d: { year: number; mean: number }) => x(String(d.year)) ?? 0)
+        .y((d: { year: number; mean: number }) => y(d.mean))
+        .curve(d3.curveBasis);
+
+      svg
+        .append("path")
+        .datum(trendData)
+        .attr("fill", "none")
+        .attr("stroke", "blue")
+        .attr("stroke-width", 2)
+        .attr("d", trendLine);
+    }
+  }, [data, showMeanLine, showTrendLine]);
 
   return (
     <div
       style={{
         display: "flex",
-        justifyContent: "center",
+        flexDirection: "column",
         alignItems: "center",
-        height: "100vh",
         backgroundColor: "#F9F28D",
+        padding: "20px",
       }}
     >
+      <div style={{ marginBottom: "10px" }}>
+        <label style={{ marginRight: "10px" }}>
+          <input
+            type="checkbox"
+            checked={showMeanLine}
+            onChange={() => setShowMeanLine(!showMeanLine)}
+          />
+          Show Mean Line
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={showTrendLine}
+            onChange={() => setShowTrendLine(!showTrendLine)}
+          />
+          Show Trend Line
+        </label>
+      </div>
       <svg ref={svgRef}></svg>
       <div
         ref={tooltipRef}
