@@ -1,0 +1,20 @@
+.scatterplotSquare {
+  fill-opacity: 0.7;
+  stroke-width: 0.5px;
+  stroke: "white";
+}
+
+.dimmed {
+  opacity: 0;
+  transition: opacity;
+  transition-delay: 0.5s;
+  transition-duration: 0.5s;
+}
+
+.scatterplotSquare:hover {
+  cursor: pointer;
+  opacity: 1;
+  stroke: black;
+  fill-opacity: 1;
+  stroke-width: 2px;
+}
