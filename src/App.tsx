@@ -7,13 +7,15 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Button,
 } from "@mui/material";
 import YearBoxPlotComponent from "./components/YearBoxPlotComponent";
 import ScoreYearComponent from "./components/ScoreYearComponent";
 import GenreBoxPlotComponent from "./components/GenreBoxPlotComponent";
+import FilterableBoxPlotComponent from "./components/FilterableBoxPlotComponent";
+import AboutComponent from "./components/AboutComponent";
 import { ReviewData, processJsonl } from "./data";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import FilterableBoxPlotComponent from "./components/FilterableBoxPlotComponent";
 
 const theme = createTheme({
   palette: {
@@ -66,6 +68,8 @@ const App: React.FC = () => {
         return <GenreBoxPlotComponent data={data} />;
       case "Custom Box Plot Comparison":
         return <FilterableBoxPlotComponent data={data} />;
+      case "About":
+        return <AboutComponent />;
       default:
         return <ScoreYearComponent data={data} />;
     }
@@ -83,7 +87,12 @@ const App: React.FC = () => {
       >
         <AppBar position="static" color="primary">
           <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, cursor: "pointer" }}
+              onClick={() => setSelectedPlot("Score vs Date")}
+            >
               The Needle Point
             </Typography>
             <Select
@@ -117,8 +126,14 @@ const App: React.FC = () => {
               <MenuItem value="Custom Box Plot Comparison">
                 Custom Box Plot Comparison
               </MenuItem>
-              {/* Add more options here */}
             </Select>
+            <Button
+              color="inherit"
+              onClick={() => setSelectedPlot("About")}
+              sx={{ marginLeft: 2 }}
+            >
+              About
+            </Button>
           </Toolbar>
         </AppBar>
         <Container sx={{ flex: 1, marginTop: 4 }}>{renderPlot()}</Container>
