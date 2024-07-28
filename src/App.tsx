@@ -42,7 +42,7 @@ const App: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://raw.githubusercontent.com/doyled-it/theneedlescrape/main/data/new-mbid_info.jsonl"
+          "https://raw.githubusercontent.com/doyled-it/theneedlescrape/main/data/mbid_review_info.jsonl"
         );
         const rawData = await response.text();
         const processedData = processJsonl(rawData);
