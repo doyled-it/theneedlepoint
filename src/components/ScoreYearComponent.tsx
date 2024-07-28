@@ -1,6 +1,14 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { ReviewData } from "../data";
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 
 interface ScoreYearComponentProps {
   data: ReviewData[];
@@ -9,14 +17,21 @@ interface ScoreYearComponentProps {
 const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const [filter, setFilter] = useState("");
+  const [filterType, setFilterType] = useState<keyof ReviewData>("artist");
 
   useEffect(() => {
-    const margin = { top: 40, right: 30, bottom: 40, left: 40 }; // Increased top margin
+    const margin = { top: 40, right: 30, bottom: 40, left: 40 };
     const width = 1000 - margin.left - margin.right;
     const height = 600 - margin.top - margin.bottom;
     const bgColor = "#F9F28D";
 
-    d3.select(svgRef.current).selectAll("*").remove(); // Clear previous contents
+    d3.select(svgRef.current).selectAll("*").remove();
+
+    const filteredData = data.filter((d) => {
+      const valueToFilter = d[filterType]?.toString().toLowerCase();
+      return valueToFilter.includes(filter.toLowerCase());
+    });
 
     const svg = d3
       .select(svgRef.current)
@@ -28,7 +43,9 @@ const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
 
     const x = d3
       .scaleTime()
-      .domain(d3.extent(data, (d: ReviewData) => d.date) as [Date, Date])
+      .domain(
+        d3.extent(filteredData, (d: ReviewData) => d.date) as [Date, Date]
+      )
       .range([0, width]);
 
     const y = d3.scaleLinear().domain([0, 10]).range([height, 0]);
@@ -43,7 +60,7 @@ const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
     svg
       .append("text")
       .attr("x", width / 2)
-      .attr("y", -margin.top / 2) // Adjusted y position
+      .attr("y", -margin.top / 2)
       .attr("text-anchor", "middle")
       .style("font-family", "Montserrat, Arial, sans-serif")
       .style("font-size", "24px")
@@ -85,7 +102,7 @@ const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
 
     svg
       .selectAll(".dot")
-      .data(data)
+      .data(filteredData)
       .enter()
       .append("circle")
       .attr("class", "dot")
@@ -99,18 +116,56 @@ const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
       )
       .on("mouseout", handleMouseOut)
       .on("click", (event: MouseEvent, d: ReviewData) => handleDotClick(d));
-  }, [data]);
+  }, [data, filter, filterType]);
 
   return (
     <div
       style={{
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         height: "100vh",
         backgroundColor: "#F9F28D",
+        padding: "20px",
       }}
     >
+      <Box display="flex" alignItems="center" marginBottom="20px">
+        <FormControl
+          variant="outlined"
+          size="small"
+          style={{ marginRight: "10px" }}
+        >
+          <InputLabel>Filter Type</InputLabel>
+          <Select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value as keyof ReviewData)}
+            label="Filter Type"
+            style={{ color: "#000000" }}
+          >
+            <MenuItem value="artist" style={{ color: "#000000" }}>
+              Artist
+            </MenuItem>
+            <MenuItem value="album" style={{ color: "#000000" }}>
+              Album
+            </MenuItem>
+            <MenuItem value="original_score" style={{ color: "#000000" }}>
+              Score
+            </MenuItem>
+          </Select>
+        </FormControl>
+        <TextField
+          variant="outlined"
+          size="small"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder={`Filter by ${filterType}`}
+          style={{ width: "300px" }}
+          InputProps={{
+            style: { color: "#000000" },
+          }}
+        />
+      </Box>
       <svg ref={svgRef}></svg>
       <div
         ref={tooltipRef}

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { ReviewData } from "../data";
+import { Box, FormControlLabel, Checkbox } from "@mui/material";
 
 interface YearBoxPlotComponentProps {
   data: ReviewData[];
@@ -180,7 +181,10 @@ const YearBoxPlotComponent: React.FC<YearBoxPlotComponentProps> = ({
 
       const trendLine = d3
         .line()
-        .x((d: { year: number; mean: number }) => x(String(d.year)) ?? 0)
+        .x(
+          (d: { year: number; mean: number }) =>
+            (x(d.year.toString()) ?? 0) + x.bandwidth() / 2
+        )
         .y((d: { year: number; mean: number }) => y(d.mean))
         .curve(d3.curveBasis);
 
@@ -204,24 +208,26 @@ const YearBoxPlotComponent: React.FC<YearBoxPlotComponentProps> = ({
         padding: "20px",
       }}
     >
-      <div style={{ marginBottom: "10px" }}>
-        <label style={{ marginRight: "10px" }}>
-          <input
-            type="checkbox"
-            checked={showMeanLine}
-            onChange={() => setShowMeanLine(!showMeanLine)}
-          />
-          Show Mean Line
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={showTrendLine}
-            onChange={() => setShowTrendLine(!showTrendLine)}
-          />
-          Show Trend Line
-        </label>
-      </div>
+      <Box display="flex" alignItems="center" marginBottom="20px">
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showMeanLine}
+              onChange={() => setShowMeanLine(!showMeanLine)}
+            />
+          }
+          label="Show Mean Line"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showTrendLine}
+              onChange={() => setShowTrendLine(!showTrendLine)}
+            />
+          }
+          label="Show Trend Line"
+        />
+      </Box>
       <svg ref={svgRef}></svg>
       <div
         ref={tooltipRef}
