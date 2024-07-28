@@ -36,9 +36,7 @@ jobs:
           git config --global user.email "michaeldoyle1994@gmail.com"
           git config --global user.name "Michael Doyle"
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          personal_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          publish_branch: gh-pages
+          folder: build
