@@ -11,7 +11,7 @@ export interface ReviewData {
   youtube_link: string;
   cover_art_thumbnail: string;
   cover_art_full: string;
-  genres: string;
+  genres: string[];
 }
 
 const preprocessScores = (data: ReviewData[]): ReviewData[] => {

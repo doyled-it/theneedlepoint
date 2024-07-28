@@ -13,6 +13,7 @@ import ScoreYearComponent from "./components/ScoreYearComponent";
 import GenreBoxPlotComponent from "./components/GenreBoxPlotComponent";
 import { ReviewData, processJsonl } from "./data";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import FilterableBoxPlotComponent from "./components/FilterableBoxPlotComponent";
 
 const theme = createTheme({
   palette: {
@@ -39,7 +40,7 @@ const App: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://raw.githubusercontent.com/doyled-it/theneedlescrape/main/data/output_with_mbid_genres_and_cover_art.jsonl"
+          "https://raw.githubusercontent.com/doyled-it/theneedlescrape/main/data/new-mbid_info.jsonl"
         );
         const rawData = await response.text();
         const processedData = processJsonl(rawData);
@@ -63,6 +64,8 @@ const App: React.FC = () => {
         return <YearBoxPlotComponent data={data} />;
       case "Genre Comparison":
         return <GenreBoxPlotComponent data={data} />;
+      case "Custom Box Plot Comparison":
+        return <FilterableBoxPlotComponent data={data} />;
       default:
         return <ScoreYearComponent data={data} />;
     }
@@ -111,6 +114,9 @@ const App: React.FC = () => {
               <MenuItem value="Score vs Date">Score vs Date</MenuItem>
               <MenuItem value="Score vs Year">Score vs Year</MenuItem>
               <MenuItem value="Genre Comparison">Genre Comparison</MenuItem>
+              <MenuItem value="Custom Box Plot Comparison">
+                Custom Box Plot Comparison
+              </MenuItem>
               {/* Add more options here */}
             </Select>
           </Toolbar>
