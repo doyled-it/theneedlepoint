@@ -14,29 +14,30 @@ export interface ReviewData {
   genres: string[];
 }
 
-const preprocessScores = (data: ReviewData[]): ReviewData[] => {
-  return data.map((review) => {
-    let score: number;
-    if (typeof review.original_score === "string") {
-      const scoreLower = review.original_score.toLowerCase();
-      if (scoreLower.includes("classic")) {
-        score = 9.5;
-      } else if (scoreLower.includes("not good")) {
-        score = 0.5;
-      } else {
-        const parsedScore = parseFloat(scoreLower);
-        if (!isNaN(parsedScore)) {
-          score = parsedScore;
-        } else {
-          score = 5.5;
-        }
-      }
-    } else {
-      score = review.score;
-    }
-    return { ...review, score };
-  });
-};
+// I might add this back in later
+// const preprocessScores = (data: ReviewData[]): ReviewData[] => {
+//   return data.map((review) => {
+//     let score: number;
+//     if (typeof review.original_score === "string") {
+//       const scoreLower = review.original_score.toLowerCase();
+//       if (scoreLower.includes("classic")) {
+//         score = 9.5;
+//       } else if (scoreLower.includes("not good")) {
+//         score = 0.5;
+//       } else {
+//         const parsedScore = parseFloat(scoreLower);
+//         if (!isNaN(parsedScore)) {
+//           score = parsedScore;
+//         } else {
+//           score = 5.5;
+//         }
+//       }
+//     } else {
+//       score = review.score;
+//     }
+//     return { ...review, score };
+//   });
+// };
 export const processJsonl = (rawContent: string): ReviewData[] => {
   const data: ReviewData[] = [];
   const lines = rawContent.split("\n");
