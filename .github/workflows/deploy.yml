@@ -24,6 +24,7 @@ jobs:
       - name: Build the project
         run: |
           CI=false npm run build
+          cp CNAME build/
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
