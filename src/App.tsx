@@ -7,38 +7,29 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  MenuProps,
 } from "@mui/material";
 import YearBoxPlotComponent from "./components/YearBoxPlotComponent";
 import ScoreYearComponent from "./components/ScoreYearComponent";
+import GenreBoxPlotComponent from "./components/GenreBoxPlotComponent";
 import { ReviewData, processJsonl } from "./data";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#000000", // Black color for AppBar
+      main: "#000000",
     },
     secondary: {
-      main: "#1c1c1c", // Off-black color for dropdown background
+      main: "#F9F28D",
     },
     text: {
-      primary: "#FFFFFF", // White color for text
+      primary: "#FFFFFF",
     },
   },
   typography: {
     fontFamily: "Montserrat, Arial, sans-serif",
   },
 });
-
-const menuProps: Partial<MenuProps> = {
-  PaperProps: {
-    style: {
-      backgroundColor: "#1c1c1c",
-      color: "#FFFFFF",
-    },
-  },
-};
 
 const App: React.FC = () => {
   const [selectedPlot, setSelectedPlot] = useState<string>("Score vs Date");
@@ -48,7 +39,7 @@ const App: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://raw.githubusercontent.com/doyled-it/theneedlescrape/main/data/review_info_w_cover_art.jsonl"
+          "https://raw.githubusercontent.com/doyled-it/theneedlescrape/main/data/output_with_mbid_genres_and_cover_art.jsonl"
         );
         const rawData = await response.text();
         const processedData = processJsonl(rawData);
@@ -70,6 +61,8 @@ const App: React.FC = () => {
         return <ScoreYearComponent data={data} />;
       case "Score vs Year":
         return <YearBoxPlotComponent data={data} />;
+      case "Genre Comparison":
+        return <GenreBoxPlotComponent data={data} />;
       default:
         return <ScoreYearComponent data={data} />;
     }
@@ -87,11 +80,7 @@ const App: React.FC = () => {
       >
         <AppBar position="static" color="primary">
           <Toolbar>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, color: "text.primary" }}
-            >
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               The Needle Point
             </Typography>
             <Select
@@ -99,22 +88,29 @@ const App: React.FC = () => {
               onChange={handlePlotChange}
               displayEmpty
               inputProps={{ "aria-label": "Select Plot" }}
-              MenuProps={menuProps}
               sx={{
-                color: "text.primary",
-                backgroundColor: "secondary.main",
+                color: "primary",
+                backgroundColor: "#333333",
                 borderRadius: "4px",
-                ".MuiSvgIcon-root": {
-                  color: "text.primary",
+                "& .MuiSelect-icon": {
+                  color: "#FFFFFF",
+                },
+                "&:hover": {
+                  backgroundColor: "#555555",
+                },
+              }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    backgroundColor: "#333333",
+                    color: "#FFFFFF",
+                  },
                 },
               }}
             >
-              <MenuItem value="Score vs Date" sx={{ color: "text.primary" }}>
-                Score vs Date
-              </MenuItem>
-              <MenuItem value="Score vs Year" sx={{ color: "text.primary" }}>
-                Score vs Year
-              </MenuItem>
+              <MenuItem value="Score vs Date">Score vs Date</MenuItem>
+              <MenuItem value="Score vs Year">Score vs Year</MenuItem>
+              <MenuItem value="Genre Comparison">Genre Comparison</MenuItem>
               {/* Add more options here */}
             </Select>
           </Toolbar>

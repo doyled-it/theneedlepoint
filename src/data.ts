@@ -11,6 +11,7 @@ export interface ReviewData {
   youtube_link: string;
   cover_art_thumbnail: string;
   cover_art_full: string;
+  genres: string;
 }
 
 const preprocessScores = (data: ReviewData[]): ReviewData[] => {
@@ -36,7 +37,6 @@ const preprocessScores = (data: ReviewData[]): ReviewData[] => {
     return { ...review, score };
   });
 };
-
 export const processJsonl = (rawContent: string): ReviewData[] => {
   const data: ReviewData[] = [];
   const lines = rawContent.split("\n");
@@ -51,6 +51,9 @@ export const processJsonl = (rawContent: string): ReviewData[] => {
         const year = safeFloat(review["year"]);
         if (date == null || year == null) continue;
 
+        const genres = review["mb_genres"] || "";
+        console.log("Parsed genres:", genres); // Add debug log
+
         data.push({
           date: new Date(date),
           year: year,
@@ -61,13 +64,14 @@ export const processJsonl = (rawContent: string): ReviewData[] => {
           youtube_link: review["youtube_link"] || "",
           cover_art_thumbnail: review["cover_art_thumbnail"] || "",
           cover_art_full: review["cover_art_full"] || "",
+          genres: genres,
         });
       } catch (error) {
         console.error(`Error parsing JSON: ${error}`);
       }
     }
   }
-  return preprocessScores(data);
+  return data;
 };
 
 export const getPlotData = (data: ReviewData[]) => {
