@@ -28,6 +28,9 @@ jobs:
       - name: Copy CNAME file
         run: cp CNAME build/CNAME
 
+      - name: No Jekyll
+        run: touch build/.nojekyll
+
       - name: Configure Git
         run: |
           git config --global user.email "michaeldoyle1994@gmail.com"
