@@ -8,7 +8,9 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from "@mui/material";
+import { D3ZoomEvent } from "d3-zoom";
 
 interface ScoreYearComponentProps {
   data: ReviewData[];
@@ -41,6 +43,15 @@ const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // Define the clip path
+    svg
+      .append("defs")
+      .append("clipPath")
+      .attr("id", "clip")
+      .append("rect")
+      .attr("width", width)
+      .attr("height", height);
+
     const x = d3
       .scaleTime()
       .domain(
@@ -48,14 +59,19 @@ const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
       )
       .range([0, width]);
 
-    const y = d3.scaleLinear().domain([0, 10]).range([height, 0]);
+    const yPadding = 0.5;
 
-    svg
+    // Adjust yDomain for more space above and below the points
+    const initialYDomain = [0 - yPadding, 10 + yPadding];
+
+    const y = d3.scaleLinear().domain(initialYDomain).range([height, 0]);
+
+    const xAxis = svg
       .append("g")
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(x));
 
-    svg.append("g").call(d3.axisLeft(y));
+    const yAxis = svg.append("g").call(d3.axisLeft(y));
 
     svg
       .append("text")
@@ -86,6 +102,8 @@ const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
       `);
       const tooltipWidth = tooltip.node()?.clientWidth || 0;
       const tooltipHeight = tooltip.node()?.clientHeight || 0;
+      // tooltip.style("left", `${event.clientX - tooltipWidth / 2}px`);
+      // tooltip.style("top", `${event.clientY - tooltipHeight - 10}px`);
       tooltip.style("left", `${event.clientX - tooltipWidth / 2}px`);
       tooltip.style("top", `${event.clientY - tooltipHeight - 10}px`);
     };
@@ -100,7 +118,9 @@ const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
       }
     };
 
-    svg
+    const dots = svg
+      .append("g")
+      .attr("clip-path", "url(#clip)")
       .selectAll(".dot")
       .data(filteredData)
       .enter()
@@ -116,6 +136,34 @@ const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
       )
       .on("mouseout", handleMouseOut)
       .on("click", (event: MouseEvent, d: ReviewData) => handleDotClick(d));
+
+    const zoom = d3
+      .zoom()
+      .scaleExtent([1, 10])
+      .translateExtent([
+        [-width, -height],
+        [2 * width, 2 * height],
+      ])
+      .on("zoom", (event: D3ZoomEvent<Element, unknown>) => {
+        const newX = event.transform.rescaleX(x);
+        const newY = event.transform.rescaleY(y);
+
+        xAxis.call(d3.axisBottom(newX));
+        yAxis.call(d3.axisLeft(newY));
+
+        dots
+          .attr("cx", (d: ReviewData) => newX(d.date))
+          .attr("cy", (d: ReviewData) => newY(d.score));
+      });
+
+    svg
+      .append("rect")
+      .attr("width", width)
+      .attr("height", height)
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .lower() // Ensure the rect is at the bottom of the SVG
+      .call(zoom);
   }, [data, filter, filterType]);
 
   return (
@@ -166,6 +214,16 @@ const ScoreYearComponent: React.FC<ScoreYearComponentProps> = ({ data }) => {
           }}
         />
       </Box>
+      <Typography
+        variant="body2"
+        style={{
+          color: "#333",
+          marginBottom: "10px",
+          fontFamily: "Montserrat, Arial, sans-serif",
+        }}
+      >
+        Scroll to zoom and click and drag to navigate the chart.
+      </Typography>
       <svg ref={svgRef}></svg>
       <div
         ref={tooltipRef}
