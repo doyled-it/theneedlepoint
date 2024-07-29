@@ -1,7 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container, Typography } from "@mui/material";
 
 const AboutComponent: React.FC = () => {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js";
+    script.setAttribute("data-name", "bmc-button");
+    script.setAttribute("data-slug", "doyled.it");
+    script.setAttribute("data-color", "#FFDD00");
+    script.setAttribute("data-emoji", "☕");
+    script.setAttribute("data-font", "Cookie");
+    script.setAttribute("data-text", "Buy me a Red Bull");
+    script.setAttribute("data-outline-color", "#000000");
+    script.setAttribute("data-font-color", "#000000");
+    script.setAttribute("data-coffee-color", "#ffffff");
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   return (
     <Container style={{ backgroundColor: "#F9F28D", padding: "20px" }}>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -78,6 +99,20 @@ const AboutComponent: React.FC = () => {
         </a>{" "}
         on GitHub.
       </Typography>
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <a
+          href="https://www.buymeacoffee.com/doyled.it"
+          className="bmc-button"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+            alt="Buy me a Red Bull"
+            style={{ height: "60px", width: "217px" }}
+          />
+        </a>
+      </div>
     </Container>
   );
 };
